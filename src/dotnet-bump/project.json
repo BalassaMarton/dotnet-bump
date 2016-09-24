@@ -1,16 +1,28 @@
 ﻿{
   "version": "1.0.0-*",
+  "authors": [
+    "Balassa Marton"
+  ],
+  "description": "A dotnet-cli command that bumps the version number of the current project. This is useful when working with multiple .NET Core projects placed in different solutions, referencing each other as NuGet packages.",
   "buildOptions": {
     "emitEntryPoint": true
   },
-
+  "packOptions": {
+    "licenseUrl": "http://www.opensource.org/licenses/MIT",
+    "projectUrl": "https://github.com/BalassaMarton/dotnet-bump",
+    "owners": [
+      "Balassa Marton"
+    ]
+  },
   "dependencies": {
+    "Microsoft.DotNet.ProjectModel": "1.0.0-rc4-003206",
     "Microsoft.NETCore.App": {
       "type": "platform",
-      "version": "1.0.1"
-    }
+      "version": "1.0.0"
+    },
+    "Newtonsoft.Json": "9.0.1",
+    "NuGet.Client": "3.5.0-rc1-final"
   },
-
   "frameworks": {
     "netcoreapp1.0": {
       "imports": "dnxcore50"

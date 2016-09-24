@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "dotnet-bump": {
+      "commandName": "Project",
+      "commandLineArgs": "aasdas"
+    }
+  }
+}
