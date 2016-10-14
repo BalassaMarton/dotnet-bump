@@ -13,7 +13,7 @@ Add `dotnet bump` as a tool to your project by including the following into your
 {
 	"tools":
 		{
-			"dotnet-bump": "1.0.0"
+			"dotnet-bump": "1.0.1"
 		}
 }
 ```
