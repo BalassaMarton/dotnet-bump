@@ -1,5 +1,5 @@
-﻿{
-  "version": "1.0.0-*",
+{
+  "version": "1.0.1-*",
   "authors": [
     "Balassa Marton"
   ],
@@ -15,7 +15,7 @@
     ]
   },
   "dependencies": {
-    "Microsoft.DotNet.ProjectModel": "1.0.0-rc4-003206",
+    "Microsoft.DotNet.ProjectModel": "1.0.0-rc3-003121",
     "Microsoft.NETCore.App": {
       "type": "platform",
       "version": "1.0.0"
