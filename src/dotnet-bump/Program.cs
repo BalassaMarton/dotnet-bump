@@ -1,24 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Security;
-using System.Threading.Tasks;
-using Microsoft.DotNet.ProjectModel;
-using Newtonsoft.Json;
+using System.Xml.Linq;
 using NuGet.Versioning;
 
 namespace DotnetBump
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static int Main(string[] args)
         {
             string[] validParts = new[] { "major", "minor", "patch", "revision" };
             string part = "revision";
-            var targetConfiguration = "";
-            var configuration = "";
             var i = 0;
+            var projectFilePath = string.Empty;
             if (args.Length > 0)
             {
                 var idx = Array.FindIndex(validParts, x => x == args[0].ToLower());
@@ -28,35 +23,42 @@ namespace DotnetBump
                     i++;
                 }
             }
-            while (i < args.Length)
+            try
             {
-                if (args[i] == "-t" || args[i] == "--target-configuration")
+                while (i < args.Length)
                 {
-                    i++;
-                    targetConfiguration = args[i];
-                    i++;
+                    if (File.Exists(args[i]))
+                    {
+                        projectFilePath = args[i];
+                        i++;
+                    }
+                    else
+                        InvalidArgs();
                 }
-                else if (args[i] == "-c" || args[i] == "--configuration")
+                if (string.IsNullOrEmpty(projectFilePath))
+                    projectFilePath = Directory.GetFiles(Directory.GetCurrentDirectory(), "*.csproj").FirstOrDefault();
+                if (string.IsNullOrEmpty(projectFilePath))
                 {
-                    i++;
-                    configuration = args[i];
-                    i++;
-                }
-                else
+                    Console.Error.WriteLine("Cannot find project file");
                     InvalidArgs();
+                }
             }
-            if (!string.IsNullOrEmpty(targetConfiguration) && configuration != targetConfiguration)
-                return;
-            var projectFilePath =
-                    $"{Directory.GetCurrentDirectory()}{Path.DirectorySeparatorChar}{Project.FileName}";
+            catch (ArgumentException e)
+            {
+                Console.Error.WriteLine(e.Message);
+                return -1;
+            }
             Console.WriteLine($"Loading project from {projectFilePath}...");
-            dynamic projectFile = JsonConvert.DeserializeObject(File.ReadAllText(projectFilePath));
-            var version = (string)projectFile.version;
-            if (string.IsNullOrEmpty(version))
+            XDocument projectFile;
+            using (var f = File.OpenRead(projectFilePath))
+                projectFile = XDocument.Load(f);
+            var versionElement=projectFile.Root?.Elements("PropertyGroup").Select(x=>x.Element("Version")).FirstOrDefault();
+            if (string.IsNullOrEmpty(versionElement?.Value))
             {
                 Console.WriteLine("Missing project version, left unchanged");
-                return;
+                return -1;
             }
+            var version = versionElement.Value;
             var suffix = version.EndsWith("-*");
             if (suffix)
             {
@@ -86,15 +88,16 @@ namespace DotnetBump
             version = newVersion.ToString();
             if (suffix)
                 version = version + "-*";
-            projectFile.version = version;
+            versionElement.Value = version;
             Console.WriteLine($"Saving project....");
-            File.WriteAllText(projectFilePath, JsonConvert.SerializeObject(projectFile, Formatting.Indented));
+            using(var f=File.CreateText(projectFilePath))projectFile.Save(f);
             Console.WriteLine($"Project saved.");
+            return 0;
         }
 
         private static void InvalidArgs()
         {
-            throw new ArgumentException("Usage: dotnet bump [major | minor | patch | revision] [--configuration <configuration>] [--target-configuration <target-configuration>]");
+            throw new ArgumentException("Usage: dotnet bump-version [major | minor | patch | revision] [path-to-project-file]");
         }
     }
 }
