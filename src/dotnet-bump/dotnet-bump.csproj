@@ -17,8 +17,4 @@
     <StartupObject>DotnetBump.Program</StartupObject>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="NuGet.Client" Version="4.3.0-beta1-2418" />
-  </ItemGroup>
-
 </Project>
