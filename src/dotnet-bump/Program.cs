@@ -36,9 +36,14 @@ public class Program
             name: "--sln",
             description: "The path to solution (.sln) file.");
 
-        rootCommand.AddOption(partOption);
+        var partArgument = new Argument<string>(
+            name: "part",
+            description: "The part of version to be updated, supported values are major, minor, patch, revision.");
+
+        rootCommand.AddArgument(partArgument);
         rootCommand.AddOption(csprojFileOption);
         rootCommand.AddOption(slnFileOption);
+
 
         rootCommand.SetHandler(async (pov, cfov) => {
             //pov contains part option value
@@ -169,30 +174,29 @@ public class Program
         {
             //csproj file
             FileInfo slnjFI = sfov as FileInfo;
-            if (slnjFI == null)
+            if (slnjFI != null)
             {
-                throw new ArgumentException("please provide an sln file");
-            }
+                //throw new ArgumentException("please provide a sln file");
+                var solutionFilePath = slnjFI.FullName;
 
-            var solutionFilePath = slnjFI.FullName;
+                var sfData = SolutionFile.Parse(solutionFilePath);
 
-            var sfData = SolutionFile.Parse(solutionFilePath);
-
-            var projectsInSolution = sfData.ProjectsInOrder;
-            foreach (var project in projectsInSolution)
-            {
-                switch (project.ProjectType)
+                var projectsInSolution = sfData.ProjectsInOrder;
+                foreach (var project in projectsInSolution)
                 {
-                    case SolutionProjectType.KnownToBeMSBuildFormat:
-                        {
-                            await UpdateVersionAsync(pov, new FileInfo(project.AbsolutePath));
-                            break;
-                        }
-                    case SolutionProjectType.SolutionFolder:
-                        {
-                            Console.WriteLine("Another solution file found, skipping it");
-                            break;
-                        }
+                    switch (project.ProjectType)
+                    {
+                        case SolutionProjectType.KnownToBeMSBuildFormat:
+                            {
+                                await UpdateVersionAsync(pov, new FileInfo(project.AbsolutePath));
+                                break;
+                            }
+                        case SolutionProjectType.SolutionFolder:
+                            {
+                                Console.WriteLine("Another solution file found, skipping it");
+                                break;
+                            }
+                    }
                 }
             }
         });

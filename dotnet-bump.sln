@@ -1,12 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26621.2
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32811.315
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{D45B9303-5D06-45E7-BF9A-183AA38C42E0}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D88039FE-C432-42B5-B47C-9D850A1B9DAD}"
 	ProjectSection(SolutionItems) = preProject
+		Dockerfile = Dockerfile
 		readme.md = readme.md
 	EndProjectSection
 EndProject
