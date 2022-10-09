@@ -24,10 +24,6 @@ public class Program
     {
         var rootCommand = new RootCommand($"Command line tool for version bump of dotnet applications v {Assembly.GetAssembly(typeof(Program)).GetName().Version}");
 
-        var partOption = new Option<string>(
-            name: "--part",
-            description: "The part of version to be updated, supported values are major, minor, patch, revision.");
-
         var csprojFileOption = new Option<FileInfo>(
             name: "--csproj",
             description: "The path to C# project (.csproj) file.");
@@ -49,13 +45,13 @@ public class Program
             //pov contains part option value
             //cfov contains csproj file option value
             await UpdateVersionAsync(pov, cfov);
-        }, partOption, csprojFileOption);
+        }, partArgument, csprojFileOption);
 
         rootCommand.SetHandler(async (pov, sfov) => {
             //pov contains part option value
             //sfov contains sln file option value
             await UpdateVersionSolutionAsync(pov, sfov);
-        }, partOption, slnFileOption);
+        }, partArgument, slnFileOption);
 
         return await rootCommand.InvokeAsync(args);
     }
