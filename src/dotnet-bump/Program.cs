@@ -10,7 +10,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using Microsoft.Build.Construction;
 
-namespace DotnetBump;
+namespace DotnetBump{
 
 public class Program
 {
@@ -202,4 +202,5 @@ public class Program
     {
         throw new ArgumentException("Usage: dotnet bump-version [major | minor | patch | revision] [path-to-project-file]");
     }
+}
 }

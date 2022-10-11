@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Description>A dotnet-cli command that bumps the version number of the current project. This is useful when working with multiple .NET Core projects placed in different solutions, referencing each other as NuGet packages.</Description>
     <Authors>Balassa Marton, Andrey Zakharov</Authors>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFrameworks>net5.0;net6.0;netcoreapp3.1</TargetFrameworks>
     <AssemblyName>dotnet-bump-version</AssemblyName>
     <OutputType>Exe</OutputType>
     <PackageId>dotnet-bump-version</PackageId>
@@ -13,12 +13,13 @@
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
     <RootNamespace>dotnet-bump-version</RootNamespace>
-    <Version>2.0.0</Version>
+    <Version>2.0.1</Version>
     <StartupObject>DotnetBump.Program</StartupObject>
-    <AssemblyVersion>2.0.0</AssemblyVersion>
-    <FileVersion>2.0.0</FileVersion>
+    <AssemblyVersion>2.0.1</AssemblyVersion>
+    <FileVersion>2.0.1</FileVersion>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerfileContext>..\..</DockerfileContext>
+    <LanguageVersion>10</LanguageVersion>
   </PropertyGroup>
 
   <ItemGroup>
