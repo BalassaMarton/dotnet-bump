@@ -12,16 +12,17 @@ and all your .NET Core projects in different solutions can reference the latest 
 - `Version`, `AssemblyVersion` and `FileVersion` is now searched and updated in `.csproj` file
 - `Docker` support added, can be handy to be used in `CI/CD` pipelines
 
+## Whats new in v 2.0.1
+- Bugfix, when `--csproj` is provided it doesn't work
+- `--suffix` command line option is added
+
 ## Usage
 
-### Version 2.0.0
+### Version 2.0.1
 
 ```sh
-D:\Checkout\dotnet-bump\src\dotnet-bump\bin\Debug\net6.0>dotnet dotnet-bump-version.dll
-Required argument missing for command: 'dotnet-bump-version'.
-
 Description:
-  Command line tool for version bump of dotnet applications v 2.0.0.0
+  Command line tool for version bump of dotnet applications v 2.0.1.0
 
 Usage:
   dotnet-bump-version <part> [options]
@@ -30,8 +31,11 @@ Arguments:
   <part>  The part of version to be updated, supported values are major, minor, patch, revision.
 
 Options:
-  --csproj <csproj>  The path to C# project (.csproj) file.
-  --sln <sln>        The path to solution (.sln) file.
+  --suffix <suffix>  The suffix to be appended to version, it would be appended to version with leading -. e.g. if
+                     suffix is set to 'rc1' final version would be x.x.x.x-rc1
+  --csproj <csproj>  The path to C# project (.csproj) file. This option will be given precedence over --sln if both are
+                     provided at same time.
+  --sln <sln>        The path to solution (.sln) file. If --csproj is provided, this option will be ignored.
   --version          Show version information
   -?, -h, --help     Show help and usage information
 ```
