@@ -15,8 +15,8 @@
     <RootNamespace>dotnet-bump-version</RootNamespace>
     <Version>2.0.0</Version>
     <StartupObject>DotnetBump.Program</StartupObject>
-    <AssemblyVersion>2.0.0</AssemblyVersion>
-    <FileVersion>2.0.0</FileVersion>
+    <AssemblyVersion>2.0.1</AssemblyVersion>
+    <FileVersion>2.0.1</FileVersion>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerfileContext>..\..</DockerfileContext>
   </PropertyGroup>

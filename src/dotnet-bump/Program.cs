@@ -26,37 +26,44 @@ public class Program
 
         var csprojFileOption = new Option<FileInfo>(
             name: "--csproj",
-            description: "The path to C# project (.csproj) file.");
+            description: "The path to C# project (.csproj) file. This option will be given precedence over --sln if both are provided at same time.");
 
         var slnFileOption = new Option<FileInfo>(
             name: "--sln",
-            description: "The path to solution (.sln) file.");
+            description: "The path to solution (.sln) file. If --csproj is provided, this option will be ignored.");
 
         var partArgument = new Argument<string>(
             name: "part",
             description: "The part of version to be updated, supported values are major, minor, patch, revision.");
 
+        var suffixOption = new Option<string>(
+            name: "--suffix",
+            description: "The suffix to be appended to version, it would be appended to version with leading -. e.g. if suffix is set to 'rc1' final version would be x.x.x.x-rc1"
+            );
+
         rootCommand.AddArgument(partArgument);
+        rootCommand.AddOption(suffixOption);
         rootCommand.AddOption(csprojFileOption);
         rootCommand.AddOption(slnFileOption);
 
-
-        rootCommand.SetHandler(async (pov, cfov) => {
-            //pov contains part option value
-            //cfov contains csproj file option value
-            await UpdateVersionAsync(pov, cfov);
-        }, partArgument, csprojFileOption);
-
-        rootCommand.SetHandler(async (pov, sfov) => {
+        rootCommand.SetHandler(async (pov, sfov, cfov, sfxov) => {
             //pov contains part option value
             //sfov contains sln file option value
-            await UpdateVersionSolutionAsync(pov, sfov);
-        }, partArgument, slnFileOption);
+            //cfov contains csproj file option value
+            //sfxov contains suffix option value
+            await UpdateVersionSolutionAsync(pov, sfov, cfov, sfxov);
+        }, partArgument, slnFileOption, csprojFileOption, suffixOption);
 
         return await rootCommand.InvokeAsync(args);
     }
 
-    private static async Task UpdateVersionAsync(object pov, object cfov)
+    /// <summary>
+    /// Update a csproj file
+    /// </summary>
+    /// <param name="pov"></param>
+    /// <param name="cfov"></param>
+    /// <returns></returns>
+    private static async Task UpdateProjectVersionAsync(object pov, object cfov, object sfxov)
     {
         await Task.Run(() =>
         {
@@ -115,20 +122,24 @@ public class Program
                             version = version.Substring(0, version.Length - 2);
                         }
                         var oldVersion = new SemVer(version);
+                        
+                        //check for suffix, if that is provided give precidence to it
+                        string newSuffix = sfxov?.ToString() ?? oldVersion.Suffix;
+
                         SemVer newVersion;
                         switch (part)
                         {
                             case "major":
-                                newVersion = new SemVer(oldVersion.Major + 1, oldVersion.Minor, oldVersion.Build, oldVersion.Fix, oldVersion.Suffix, oldVersion.Buildvars);
+                                newVersion = new SemVer(oldVersion.Major + 1, oldVersion.Minor, oldVersion.Build, oldVersion.Fix, newSuffix, oldVersion.Buildvars);
                                 break;
                             case "minor":
-                                newVersion = new SemVer(oldVersion.Major, oldVersion.Minor + 1, oldVersion.Build, oldVersion.Fix, oldVersion.Suffix, oldVersion.Buildvars);
+                                newVersion = new SemVer(oldVersion.Major, oldVersion.Minor + 1, oldVersion.Build, oldVersion.Fix, newSuffix, oldVersion.Buildvars);
                                 break;
                             case "patch":
-                                newVersion = new SemVer(oldVersion.Major, oldVersion.Minor, oldVersion.Build + 1, oldVersion.Fix, oldVersion.Suffix, oldVersion.Buildvars);
+                                newVersion = new SemVer(oldVersion.Major, oldVersion.Minor, oldVersion.Build + 1, oldVersion.Fix, newSuffix, oldVersion.Buildvars);
                                 break;
                             case "revision":
-                                newVersion = new SemVer(oldVersion.Major, oldVersion.Minor, oldVersion.Build, oldVersion.Fix + 1, oldVersion.Suffix, oldVersion.Buildvars);
+                                newVersion = new SemVer(oldVersion.Major, oldVersion.Minor, oldVersion.Build, oldVersion.Fix + 1, newSuffix, oldVersion.Buildvars);
                                 break;
                             default:
                                 throw new InvalidOperationException();
@@ -164,42 +175,55 @@ public class Program
         });
     }
 
-    private static async Task UpdateVersionSolutionAsync(object pov, object sfov)
+    /// <summary>
+    /// Iterate a solution file and update all included csproj files
+    /// </summary>
+    /// <param name="pov"></param>
+    /// <param name="sfov"></param>
+    /// <returns></returns>
+    private static async Task UpdateVersionSolutionAsync(object pov, object sfov, object cfov, object sfxov)
     {
         await Task.Run(async () =>
         {
-            //csproj file
-            FileInfo slnjFI = sfov as FileInfo;
-            if (slnjFI != null)
+            //Check if csproj file is provided, give precedence to it.
+            FileInfo csprojFI = cfov as FileInfo;
+            if (csprojFI != null)
             {
-                //throw new ArgumentException("please provide a sln file");
-                var solutionFilePath = slnjFI.FullName;
-
-                var sfData = SolutionFile.Parse(solutionFilePath);
-
-                var projectsInSolution = sfData.ProjectsInOrder;
-                foreach (var project in projectsInSolution)
+                if (csprojFI != null)
                 {
-                    switch (project.ProjectType)
+                    await UpdateProjectVersionAsync(pov, csprojFI, sfxov);
+                }
+            }
+            else
+            {
+                //sln file
+                FileInfo slnjFI = sfov as FileInfo;
+                if (slnjFI != null)
+                {
+                    //throw new ArgumentException("please provide a sln file");
+                    var solutionFilePath = slnjFI.FullName;
+
+                    var sfData = SolutionFile.Parse(solutionFilePath);
+
+                    var projectsInSolution = sfData.ProjectsInOrder;
+                    foreach (var project in projectsInSolution)
                     {
-                        case SolutionProjectType.KnownToBeMSBuildFormat:
-                            {
-                                await UpdateVersionAsync(pov, new FileInfo(project.AbsolutePath));
-                                break;
-                            }
-                        case SolutionProjectType.SolutionFolder:
-                            {
-                                Console.WriteLine("Another solution file found, skipping it");
-                                break;
-                            }
+                        switch (project.ProjectType)
+                        {
+                            case SolutionProjectType.KnownToBeMSBuildFormat:
+                                {
+                                    await UpdateProjectVersionAsync(pov, new FileInfo(project.AbsolutePath), sfxov);
+                                    break;
+                                }
+                            case SolutionProjectType.SolutionFolder:
+                                {
+                                    Console.WriteLine("Another solution file found, skipping it");
+                                    break;
+                                }
+                        }
                     }
                 }
             }
         });
-    }
-
-    private static void InvalidArgs()
-    {
-        throw new ArgumentException("Usage: dotnet bump-version [major | minor | patch | revision] [path-to-project-file]");
     }
 }
