@@ -10,7 +10,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using Microsoft.Build.Construction;
 
-namespace DotnetBump;
+namespace DotnetBump{
 
 public class Program
 {
@@ -226,4 +226,5 @@ public class Program
             }
         });
     }
+}
 }
