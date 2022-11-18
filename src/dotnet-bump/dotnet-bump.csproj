@@ -1,9 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+	<TargetFramework>net6.0</TargetFramework>
     <Description>A dotnet-cli command that bumps the version number of the current project. This is useful when working with multiple .NET Core projects placed in different solutions, referencing each other as NuGet packages.</Description>
     <Authors>Balassa Marton, Andrey Zakharov</Authors>
-    <TargetFrameworks>net6.0</TargetFrameworks>
     <AssemblyName>dotnet-bump-version</AssemblyName>
     <OutputType>Exe</OutputType>
     <PackageId>dotnet-bump-version</PackageId>
