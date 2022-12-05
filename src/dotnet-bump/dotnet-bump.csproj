@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	<TargetFramework>net6.0</TargetFramework>
+    <Description>A dotnet-cli command that bumps the version number of the current project. This is useful when working with multiple .NET Core projects placed in different solutions, referencing each other as NuGet packages.</Description>
+    <Authors>Balassa Marton, Andrey Zakharov</Authors>
+    <AssemblyName>dotnet-bump-version</AssemblyName>
+    <OutputType>Exe</OutputType>
+    <PackageId>dotnet-bump-version</PackageId>
+    <PackageProjectUrl>https://github.com/killwort/dotnet-bump</PackageProjectUrl>
+    <PackageLicenseUrl>http://www.opensource.org/licenses/MIT</PackageLicenseUrl>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <RootNamespace>dotnet-bump-version</RootNamespace>
+    <Version>2.0.2</Version>
+    <StartupObject>DotnetBump.Program</StartupObject>
+    <AssemblyVersion>2.0.2</AssemblyVersion>
+    <FileVersion>2.0.2</FileVersion>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <DockerfileContext>..\..</DockerfileContext>
+    <LanguageVersion>10</LanguageVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Build" Version="17.3.1" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.0" />
+    <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
+  </ItemGroup>
+
+</Project>
